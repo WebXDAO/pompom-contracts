@@ -7,3 +7,6 @@ typechain
 #Hardhat files
 cache
 artifacts
+
+#private_key
+.secret

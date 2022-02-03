@@ -3,22 +3,29 @@ pragma solidity ^0.8.2;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
-contract POMPOM is ERC721, ERC721URIStorage, Ownable {
+contract POMPOM is ERC721, ERC721URIStorage{
     using Counters for Counters.Counter;
 
     Counters.Counter private _tokenIdCounter;
-
+    address Guest;
     constructor(
-        address _owner
-    ) ERC721("POMPOM", "POM") {}
-
-    function safeMint(address to, string memory uri) public onlyOwner {
+        address _Guest
+    ) ERC721("POMPOM", "POM") {
+        Guest = _Guest;
+    }
+    modifier onlyGuest(){
+        require(msg.sender == Guest);
+        _;
+    }
+    function safeMint(address _host, address _guest, string memory uri) public onlyGuest {
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
-        _safeMint(to, tokenId);
+        _safeMint(_host, tokenId);
+         _setTokenURI(tokenId, uri);
+        _tokenIdCounter.increment();
+        _safeMint(_guest, tokenId);
         _setTokenURI(tokenId, uri);
     }
 
