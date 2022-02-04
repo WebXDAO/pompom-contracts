@@ -5,14 +5,20 @@ import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Supply.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
-contract MyToken is ERC1155, ERC1155Supply {
+contract POM is ERC1155, ERC1155Supply {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
-    uint256[1] amountTrans;
-    amountTrans[1] = 1;
-    uint256[1] amountMint;
-    amountMint[1]=2;
     mapping(uint256 => string) private _tokenURIs;
+    uint256 totalmint = 2;
+    uint256 totalTransfer = 1;
+    // mapping(address => uint256) private _host;
+    struct POMItem {
+        uint itemId;
+        uint256 tokenId;
+        address payable host;
+        address payable guest;
+    }
+    mapping(uint256 => POMItem) private idToPOMItem;
     constructor() ERC1155("") {
 
     }
@@ -36,27 +42,31 @@ contract MyToken is ERC1155, ERC1155Supply {
     }
 
     function createPOM(
-        address account, 
+        address _guest, 
         string memory uri
     )
         public returns (uint256)
     {
         _tokenIds.increment();
         uint256 newItemId = _tokenIds.current();
-        _mint(account, newItemId, amountMint[1], "");
+
+        _mint(_guest, newItemId, totalmint, "");
         _setTokenURI(newItemId, uri);
+        idToPOMItem[newItemId] =  POMItem (
+            newItemId,
+            newItemId,
+            payable(msg.sender),
+            payable(_guest)
+        );
         return newItemId;
     }
     function confirmPOM(
-        address _guest,
-        uint256[] memory ids
+        uint256 id
     ) public{
-        safeBatchTransferFrom(msg.sender, _guest, ids, amountTrans[1])
-    }
-    function mintBatch(address to, uint256[] memory ids, uint256[] memory amounts)
-        public
-    {
-        _mintBatch(to, ids, amounts, "");
+        // require(balanceOf(_host[], uint256 _id))
+        require(balanceOf(msg.sender, id) > 1);
+        safeTransferFrom(msg.sender, idToPOMItem[id].host, id, totalTransfer, "");
+
     }
     // The following functions are overrides required by Solidity.
 
@@ -65,5 +75,45 @@ contract MyToken is ERC1155, ERC1155Supply {
         override(ERC1155, ERC1155Supply)
     {
         super._beforeTokenTransfer(operator, from, to, ids, amounts, data);
+    }
+    function POMInline() public view returns (POMItem[] memory) {
+        uint totalItemCount = _tokenIds.current();
+        uint itemCount = 0;
+        uint currentIndex = 0;
+        for(uint i = 0; i < totalItemCount; i++) {
+            if (balanceOf(msg.sender, i+1) > 1) {
+                itemCount += 1;
+            }
+        }
+        POMItem[] memory items = new POMItem[](itemCount);
+        for (uint i = 0; i < totalItemCount; i++) {
+            if (balanceOf(msg.sender, i+1) > 1){
+                uint currentId = i + 1;
+                POMItem storage currentItem = idToPOMItem[currentId];
+                items[currentIndex] = currentItem;
+                currentIndex += 1;
+            }
+        }
+        return items;
+    }
+    function POMCreated() public view returns (POMItem[] memory) {
+        uint totalItemCount = _tokenIds.current();
+        uint itemCount = 0;
+        uint currentIndex = 0;
+        for(uint i = 0; i < totalItemCount; i++) {
+            if (balanceOf(msg.sender, i+1) < 2) {
+                itemCount += 1;
+            }
+        }
+        POMItem[] memory items = new POMItem[](itemCount);
+        for (uint i = 0; i < totalItemCount; i++) {
+            if (balanceOf(msg.sender, i+1) < 2){
+                uint currentId = i + 1;
+                POMItem storage currentItem = idToPOMItem[currentId];
+                items[currentIndex] = currentItem;
+                currentIndex += 1;
+            }
+        }
+        return items;
     }
 }
