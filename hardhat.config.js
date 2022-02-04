@@ -1,6 +1,6 @@
 require("@nomiclabs/hardhat-waffle");
-const fs = require('fs');
-const privateKey = fs.readFileSync(".secret").toString().trim() || "01234567890123456789";
+// const fs = require('fs');
+// const privateKey = fs.readFileSync(".secret").toString().trim() || "01234567890123456789";
 /* const infuraId = fs.readFileSync(".infuraid").toString().trim() || ""; */
 
 module.exports = {
@@ -12,7 +12,7 @@ module.exports = {
 
     mumbai : {
       url : "https://matic-mumbai.chainstacklabs.com",
-      accounts: [privateKey]
+      accounts: ["23ce173c2b9f9c87801e63705324b7a7cbe2bd577281b21985b7dc63402f3d81"]
     }
 /*     matic: {
       Infura

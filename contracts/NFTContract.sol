@@ -28,7 +28,6 @@ contract POMPOM is ERC721, ERC721URIStorage{
         _safeMint(_guest, tokenId);
         _setTokenURI(tokenId, uri);
     }
-
     // The following functions are overrides required by Solidity.
 
     function _burn(uint256 tokenId) internal override(ERC721, ERC721URIStorage) {
