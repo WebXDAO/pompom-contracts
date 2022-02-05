@@ -101,13 +101,13 @@ contract POM is ERC1155, ERC1155Supply {
         uint itemCount = 0;
         uint currentIndex = 0;
         for(uint i = 0; i < totalItemCount; i++) {
-            if (balanceOf(msg.sender, i+1) < 2) {
+            if (balanceOf(msg.sender, i+1) == 1) {
                 itemCount += 1;
             }
         }
         POMItem[] memory items = new POMItem[](itemCount);
         for (uint i = 0; i < totalItemCount; i++) {
-            if (balanceOf(msg.sender, i+1) < 2){
+            if (balanceOf(msg.sender, i+1) == 1){
                 uint currentId = i + 1;
                 POMItem storage currentItem = idToPOMItem[currentId];
                 items[currentIndex] = currentItem;
